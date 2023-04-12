@@ -9,7 +9,7 @@ class Render:
     '''
     Constructor, set the objects or multiple objects if there are any
     '''
-    def __init__(self, filePath = None):
+    def __init__(self, filePath = None, mainObject = None):
         
         self.scene = bpy.data.scenes['Scene']
         self.camera = None
@@ -30,8 +30,10 @@ class Render:
                     
             self.camera = bpy.data.objects['Camera']
 
+         #### DONE: Set camera in view of objects
+        if mainObject:
+            self.camera.parent = bpy.data.objects[mainObject]
 
-        #### TODO: Set camera in view of objects
         
     def setCamera(self):
         pass
@@ -54,6 +56,10 @@ class Render:
         
         #### TODO Set position and different angels for camera randomize them
 
+
+
+
+        #### TEST CODE
         for i in range(1):
             print("On render:", 1)
             print("--> Location of the camera:")
@@ -70,13 +76,9 @@ class Render:
 
     def boundingBox2D(self, object):
         '''
-        Returns camera space bounding box of mesh object.`
+        Returns camera bounding box of mesh object.
 
         Negative 'z' value means the point is behind the camera.
-
-        Takes shift-x/y, lens angle and sensor size into account
-        as well as perspective/ortho projections.
-
 
         https://federicoarenasl.github.io/Data-Generation-with-Blender/#Main-function-to-extract-labels-from-all-objects-in-image
         https://blender.stackexchange.com/questions/7198/save-the-2d-bounding-box-of-an-object-in-rendered-image-to-a-text-file
@@ -129,6 +131,7 @@ class Render:
         if not lx or not ly:
             return None
             
+
         '''Limit the values between 0.0 and 1.0'''
         # min_x = np.clip(min(lx), 0.0, 1.0)
         # max_x = np.clip(max(lx), 0.0, 1.0)
@@ -152,7 +155,7 @@ class Render:
         dim_y = render.resolution_y 
 
 
-
+        '''Return coordinates in coco style annotation'''
         return (min_x*dim_x, (1-min_y)*dim_y), (max_x*dim_x, (1-max_y)*dim_y)
 
     def formatCoordinates(self, id, coordinates):
