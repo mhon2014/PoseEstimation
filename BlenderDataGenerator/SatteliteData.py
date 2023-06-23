@@ -14,13 +14,13 @@ class Generator(DataGenerator):
         Constructor, set the objects or multiple objects if there are any
         '''
 
-        self.data = bpy.data
-        self.context = bpy.context
-
         #Use this setting to setup blank workspace'''
         bpy.ops.wm.read_factory_settings(use_empty=True)
     
         bpy.ops.world.new()
+
+        # self.data = bpy.data
+        self.context = bpy.context
 
         #Current scene
         self.scene = bpy.context.scene
@@ -112,7 +112,7 @@ class Generator(DataGenerator):
         # instead of relying on bpy.context and active objects
         #self.ops.object.select_all(action='DESELECT')
 
-    def _randomQuaternion(self):
+    def randomQuaternion(self):
         #Generate a random quaternion with uniformly distributed orientations
         w = np.random.uniform(-1, 1)
         x, y, z = np.random.uniform(-1, 1, size=3)
@@ -121,13 +121,13 @@ class Generator(DataGenerator):
 
         return quat
     
-    def _getResolution(self):
+    def getResolution(self):
         resolution_scale = (self.scene.render.resolution_percentage / 100.0)
         resolution_x = self.scene.render.resolution_x * resolution_scale # [pixels]
         resolution_y = self.scene.render.resolution_y * resolution_scale # [pixels]
         return int(resolution_x), int(resolution_y)
     
-    def _cleanFolder(self, folderPath):
+    def cleanFolder(self, folderPath):
         '''
         Utility function to clear temporary folder and files if it exist,
         else create the folder, intended for internal use only
@@ -148,25 +148,25 @@ class Generator(DataGenerator):
         else:
             pass
 
-    def _loadData(self, filePath, type=None):
+    def loadData(self, filePath, type=None):
         # Possible workaround for furture
         # https://blender.stackexchange.com/questions/2170/how-to-access-render-result-pixels-from-python-script/248543#248543
         if not os.path.isfile(filePath):
             return None
         
-        data = self.data.images.load(filePath)
+        data = bpy.data.images.load(filePath)
 
         #Pixels coordinates are usually 0,0 starting top left, 
         #instead of the usual 0,0 bottom left known in math and graphs
         #https://blender.stackexchange.com/questions/471/is-it-possible-to-make-blender-a-y-up-world
         pixels = np.array(data.pixels)
-        res_x, res_y = self._getResolution()
+        res_x, res_y = self.getResolution()
         pixels.resize((res_y, res_x, 4)) #(y, x, channels)
         pixels = np.flip(pixels, 0) # Flip the y axis
 
         return pixels
 
-    def _saveData(self):
+    def saveData(self):
         pass
 
     def findCameraDistance(self, cameraArg, objectArg):
@@ -213,42 +213,64 @@ class Generator(DataGenerator):
         
         return distance
 
-    def generateData(self):
+    def generateData(self, amount = 0):
         #### TODO Set position and different angels for camera randomize them
         #### Freeform and locked
         #### DONE: Locked
+        if amount == 0:
+            print("No data generated, data size specified is 0\n")
 
         axis = self.CameraAxis
+        
+        fileList = []
+
+        annotationfile = os.path.join(self.annotationFilePath, 'annotation.json')
 
         #### TEST CODE
-        for i in range(1):
-            
-            quaternion = mathutils.Quaternion(self._randomQuaternion())
+        for i in range(amount):
+
+            #Get random quaternion for position
+            quaternion = mathutils.Quaternion(self.randomQuaternion())
             axis.rotation_quaternion = axis.rotation_quaternion @ quaternion
 
-            # print("On render:", 1)
-            # print("--> Location of the camera:")
-            # self.scene.render.filepath = os.path.join(os.path.dirname(self.dataFilePath), 'image{index}'.format(index=i))
-            self.scene.render.filepath = self.dataFilePath + '/' +'image{index}.png'.format(index = i)
-            # print(self.scene.render.filepath)
+            #Set the render save path for the image
+            imageFile = 'image{index}.png'.format(index = i)
+            imagePath = os.path.join(self.dataFilePath, imageFile)
+            self.scene.render.filepath = imagePath
 
             #render the view and save
             # self.scene.render.image_settings.file_format='JPEG'
             bpy.ops.render.render(write_still=True)
 
-            #TODO: seperate function to save and dump files?
-            annotationfile = os.path.join(self.annotationFilePath, 'testfileannotation.json')
-            # print(annotationfile)
+            #Set segmentation image file path and name
+            segmentationFile = 'segmentation{index}.npy'.format(index=i)
+            segmentationPath = os.path.join(self.annotationFilePath, segmentationFile)
 
-            bbox = self.getCoordinates()
+            # Bounding box coordinates
+            # bbox = self.getBoundingBoxCoordinates()
+
+            # retrieve segmentation
             segmentation = self.getSegmentation()
 
-            annotation = {  'quaternion' : list(axis.rotation_quaternion),
-                            'bbox': bbox
-                        }
+            #Save segmentation array to npy file
+            np.save(segmentationPath, segmentation[:,:,0])
 
-            with open(annotationfile, 'w+') as outfile:
-                json.dump(annotation, outfile)
+            #Dictionary for the annotation
+            data = {'id': i,
+                    'image_file' : imageFile,
+                    'segmentation_file' : segmentationFile,
+                    # 'bbox' : bbox,
+                    'quaternion' : list(axis.rotation_quaternion)
+                }
+            
+
+            # Append a dictionary to list
+            fileList.append(data)
+
+        #Dump the list into a json file
+        annotation = { 'images' : fileList}
+        with open(annotationfile, 'w+') as outfile:
+            json.dump(annotation, outfile)
 
     def getBoundingBox(self, object):
         '''
@@ -376,7 +398,7 @@ class Generator(DataGenerator):
         # segmentation.name = 'Segmentation'
         # segmentation.label = 'Segmentation'
 
-        self._cleanFolder(self.tempFilePath)
+        self.cleanFolder(self.tempFilePath)
 
         #Set the path for the output
         outputFile.base_path = self.tempFilePath
@@ -385,11 +407,6 @@ class Generator(DataGenerator):
         #Link the index segmentation to the slot of the output node
         links.new(renderLayers.outputs['IndexOB'], segmentationOutput)
         
-        # TODO: set temperary file, DOUBLE CHECK FUNCTION ABOVE, KISS, Single function breakdown,
-        #
-        # Implement utility class?
-        # SetNodes -> Load data -> save to NPZ?
-
         # links.new(renderLayers.outputs['IndexOB'], segmentationViewer.inputs[0])
 
         # #Link the layer output to the input of the segmentation node
@@ -407,7 +424,7 @@ class Generator(DataGenerator):
         filePath = os.path.join(self.tempFilePath, 'SegmentationMask0001.exr')
         # print(filePath)
 
-        segmentation = self._loadData(filePath)
+        segmentation = self.loadData(filePath)
 
         # print(segmentation.shape)
         # print(np.unique(segmentation))
@@ -441,7 +458,7 @@ class Generator(DataGenerator):
         else:
             pass
     
-    def getCoordinates(self):
+    def getBoundingBoxCoordinates(self):
         allBbox = []
 
         for i,object in enumerate(self.objects):
