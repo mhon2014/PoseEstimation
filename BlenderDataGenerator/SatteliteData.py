@@ -1,4 +1,3 @@
-from DataGenerator import DataGenerator
 import bpy
 import cv2
 import numpy as np
@@ -8,7 +7,7 @@ import json
 
 import os, shutil
 
-class Generator(DataGenerator):
+class Generator():
     def __init__(self, filePath = None, objectFile = None):
         '''
         Constructor, set the objects or multiple objects if there are any
@@ -44,6 +43,15 @@ class Generator(DataGenerator):
         
         #Set the scene camera to the newly added camera
         self.scene.camera = bpy.data.objects['Camera']
+
+        #Adding Sun lighting
+        lightingData= bpy.data.lights.new(name='Sun', type='SUN')
+        self.lighting = bpy.data.objects.new('Sun', lightingData)
+        self.scene.collection.objects.link(self.lighting)
+        self.lighting.parent = self.ObjectAxis
+        self.lighting.rotation_mode = 'QUATERNION'
+        self.lighting.rotation_quaternion = (1,0,0,0)
+        
 
         #define file path if given
         #can use bpy.path.abspath("//") but this seems a bit cleaner and reliable
@@ -113,7 +121,7 @@ class Generator(DataGenerator):
         #self.ops.object.select_all(action='DESELECT')
 
     def randomQuaternion(self):
-        #Generate a random quaternion with uniformly distributed orientations
+        '''Generate a random quaternion with uniformly distributed orientations'''
         w = np.random.uniform(-1, 1)
         x, y, z = np.random.uniform(-1, 1, size=3)
         mag = np.sqrt(w**2 + x**2 + y**2 + z**2)
@@ -122,6 +130,7 @@ class Generator(DataGenerator):
         return quat
     
     def getResolution(self):
+        '''Utility function used for camera resolution'''
         resolution_scale = (self.scene.render.resolution_percentage / 100.0)
         resolution_x = self.scene.render.resolution_x * resolution_scale # [pixels]
         resolution_y = self.scene.render.resolution_y * resolution_scale # [pixels]
@@ -149,7 +158,7 @@ class Generator(DataGenerator):
             pass
 
     def loadData(self, filePath, type=None):
-        # Possible workaround for furture
+        # Possible workaround for future
         # https://blender.stackexchange.com/questions/2170/how-to-access-render-result-pixels-from-python-script/248543#248543
         if not os.path.isfile(filePath):
             return None
@@ -217,10 +226,16 @@ class Generator(DataGenerator):
         #### TODO Set position and different angels for camera randomize them
         #### Freeform and locked
         #### DONE: Locked
+
+        self.cleanFolder(self.dataFilePath)
+        self.cleanFolder(self.annotationFilePath)
+
         if amount == 0:
             print("No data generated, data size specified is 0\n")
+            return
 
         axis = self.CameraAxis
+        lighting = self.lighting
         
         fileList = []
 
@@ -232,6 +247,7 @@ class Generator(DataGenerator):
             #Get random quaternion for position
             quaternion = mathutils.Quaternion(self.randomQuaternion())
             axis.rotation_quaternion = axis.rotation_quaternion @ quaternion
+            lighting.rotation_quaternion = lighting.rotation_quaternion @ quaternion
 
             #Set the render save path for the image
             imageFile = 'image{index}.png'.format(index = i)
