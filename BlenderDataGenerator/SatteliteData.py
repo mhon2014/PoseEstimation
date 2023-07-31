@@ -158,6 +158,9 @@ class Generator():
             pass
 
     def loadData(self, filePath, type=None):
+        '''
+        Utility function used to load array data from temporary exr file
+        '''
         # Possible workaround for future
         # https://blender.stackexchange.com/questions/2170/how-to-access-render-result-pixels-from-python-script/248543#248543
         if not os.path.isfile(filePath):
@@ -241,7 +244,9 @@ class Generator():
 
         annotationfile = os.path.join(self.annotationFilePath, 'annotation.json')
 
-        #### TEST CODE
+        # rng = np.random.default_rng()
+        
+
         for i in range(amount):
 
             #Get random quaternion for position
@@ -286,7 +291,7 @@ class Generator():
         #Dump the list into a json file
         annotation = { 'images' : fileList}
         with open(annotationfile, 'w+') as outfile:
-            json.dump(annotation, outfile)
+            json.dump(annotation, outfile, indent=4)
 
     def getBoundingBox(self, object):
         '''
