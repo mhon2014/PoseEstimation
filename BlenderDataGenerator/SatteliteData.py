@@ -40,6 +40,7 @@ class Generator():
         self.Camera = bpy.data.objects.new('Camera', cameraData)
         self.scene.collection.objects.link(self.Camera)
         self.Camera.parent = self.CameraAxis
+        self.cameraDistance = 0
         
         #Set the scene camera to the newly added camera
         self.scene.camera = bpy.data.objects['Camera']
@@ -51,7 +52,9 @@ class Generator():
         self.lighting.parent = self.ObjectAxis
         self.lighting.rotation_mode = 'QUATERNION'
         self.lighting.rotation_quaternion = (1,0,0,0)
-        
+
+        #Random number generator
+        self.rng = np.random.default_rng()
 
         #define file path if given
         #can use bpy.path.abspath("//") but this seems a bit cleaner and reliable
@@ -110,7 +113,10 @@ class Generator():
             #             object.parent = self.objectAxis
             #             self.objects.append(object)
 
-            self.Camera.location = (0, 0, self.findCameraDistance(self.Camera, self.objects))
+            #finds the camera distance where the entire object fits into view
+            self.cameraDistance = self.findCameraDistance(self.Camera, self.objects)
+            
+            self.Camera.location = (0, 0, self.cameraDistance)
 
         # print(self.scene.render.filepath)
 
@@ -122,8 +128,8 @@ class Generator():
 
     def randomQuaternion(self):
         '''Generate a random quaternion with uniformly distributed orientations'''
-        w = np.random.uniform(-1, 1)
-        x, y, z = np.random.uniform(-1, 1, size=3)
+        w = self.rng.uniform(-1, 1)
+        x, y, z = self.rng.uniform(-1, 1, size=3)
         mag = np.sqrt(w**2 + x**2 + y**2 + z**2)
         quat = np.array([w, x/mag, y/mag, z/mag])
 
@@ -239,12 +245,11 @@ class Generator():
 
         axis = self.CameraAxis
         lighting = self.lighting
+        camera = self.Camera
         
         fileList = []
 
         annotationfile = os.path.join(self.annotationFilePath, 'annotation.json')
-
-        # rng = np.random.default_rng()
         
 
         for i in range(amount):
@@ -253,6 +258,9 @@ class Generator():
             quaternion = mathutils.Quaternion(self.randomQuaternion())
             axis.rotation_quaternion = axis.rotation_quaternion @ quaternion
             lighting.rotation_quaternion = lighting.rotation_quaternion @ quaternion
+            
+            # distance = self.rng.uniform(0, 15*self.cameraDistance)
+            # camera.location = (0,0,distance)
 
             #Set the render save path for the image
             imageFile = 'image{index}.png'.format(index = i)
