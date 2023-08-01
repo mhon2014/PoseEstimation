@@ -1,9 +1,9 @@
 # 3DPoseEstimation
 [Description](#description)
 
-[Getting Started](#gettingStarted)
+[Getting Started](#gettingstarted)
 
-[Data Preview](#dataDreview)
+[Data Preview](#datapreview)
 
 [References](#references)
 
@@ -12,7 +12,7 @@
 ---
 This repository contains Python code to interface with blender to generate synthetic data. These data are images that include annotation of segmentation and object quaternion. Random rotation and camera distances are currently used for data generation, other variations may be included later for future addition.
 
-<h2 id='gettingStarted'> Getting Started </h2>
+<h2 id='gettingstarted'> Getting Started </h2>
 
 ---
 To get started clone this repo into you desired folder. Import the class as shown below.
@@ -23,12 +23,56 @@ from BlenderDataGenerator import SatteliteData
 generator = SatteliteData.Generator()
 
 ```
-<h2 id='dataDreview'> Data Preview </h2>
+<h2 id='datapreview'> Data Preview </h2>
 
 ---
+JSON annotation example
 ```json
-
+{
+    "images": [
+        {
+            "id": 0,
+            "image_file": "image0.png",
+            "segmentation_file": "segmentation0.npy",
+            "quaternion": [
+                -0.1703329235315323,
+                0.06445111334323883,
+                -0.8884263038635254,
+                0.42687997221946716
+            ]
+        },
+        {
+            "id": 1,
+            "image_file": "image1.png",
+            "segmentation_file": "segmentation1.npy",
+            "quaternion": [
+                0.33882102370262146,
+                -0.3533002734184265,
+                0.24369029700756073,
+                -0.5794264078140259
+            ]
+        },
+        {
+            "id": 2,
+            "image_file": "image2.png",
+            "segmentation_file": "segmentation2.npy",
+            "quaternion": [
+                0.19276432693004608,
+                0.09966883063316345,
+                -0.7412636280059814,
+                -0.19215363264083862
+            ]
+        }, 
+    ...
+    ]
+}
 ```
+Data image preview
+![Image Preview](imagePreview.png)
+
+Segmentation preview
+![Segmentation Preview](segmentationPreview.png)
+
 
 <h2 id='references'> References </h2>
 
