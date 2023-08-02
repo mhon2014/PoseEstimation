@@ -1,5 +1,4 @@
 import bpy
-import cv2
 import numpy as np
 import mathutils
 import math
@@ -19,7 +18,7 @@ class Generator():
         bpy.ops.world.new()
 
         # self.data = bpy.data
-        self.context = bpy.context
+        # self.context = bpy.context
 
         #Current scene
         self.scene = bpy.context.scene
@@ -58,45 +57,48 @@ class Generator():
 
         #define file path if given
         #can use bpy.path.abspath("//") but this seems a bit cleaner and reliable
-        self.filePath = filePath if filePath else './'
-        print(self.filePath)
+        if not filePath:
+            filePath = './'
+
+        print('Working directory: ' + filePath)
 
         try:
-            os.makedirs(self.filePath + '/data/')
+            os.makedirs(filePath + '/data/')
         except FileExistsError:
             print('Data directories exist, proceding with initialization')
         except Exception as e:
             raise e
         
         try:
-            os.makedirs(self.filePath + '/annotation/')
+            os.makedirs(filePath + '/annotation/')
         except FileExistsError:
             print('Annonation directory exist, proceding with initialization')
         except Exception as e:
             raise e
         
         try:
-            os.makedirs(self.filePath + '/tmp_exr/')
+            os.makedirs(filePath + '/tmp_exr/')
         except FileExistsError:
             print('Temporary directory exist, proceding with initialization')
         except Exception as e:
             raise e
         
-        print(self.filePath)
-        print(os.path.join(self.filePath, 'data/'))
+        
 
-        self.dataFilePath = os.path.join(self.filePath, 'data/')
-        self.annotationFilePath = os.path.join(self.filePath,'annotation/')
-        self.tempFilePath = os.path.join(self.filePath, 'tmp_exr/')
+        self.dataFilePath = os.path.join(filePath, 'data/')
+        self.annotationFilePath = os.path.join(filePath,'annotation/')
+        self.tempFilePath = os.path.join(filePath, 'tmp_exr/')
 
+        print('File Paths for data and annotation: ')
         print(self.dataFilePath)
         print(self.annotationFilePath)
         print(self.tempFilePath)
 
         #self._cleanFolder(self.tempFilePath)
 
-
         #Import Object
+        self.objects = None
+
         if objectFile:
             bpy.ops.import_scene.obj(filepath=objectFile)
 
@@ -118,6 +120,8 @@ class Generator():
             
             self.Camera.location = (0, 0, self.cameraDistance)
 
+        print(bpy.context.selected_objects)
+
         # print(self.scene.render.filepath)
 
         #https://blender.stackexchange.com/questions/27396/whats-the-difference-among-object-active-object-and-selected-objects
@@ -125,6 +129,27 @@ class Generator():
         # As long as your using bpy.data to select or modify objects directly
         # instead of relying on bpy.context and active objects
         #self.ops.object.select_all(action='DESELECT')
+
+    def setFilePaths(self):
+        pass
+    
+    def importObject(self, objectFile):
+        '''
+        Setter function for importing the object from an object file and setting the objects list
+        '''
+        if self.objects:
+            # bpy.ops.object.select_all(action='DESELECT')
+            for obj in self.objects:
+                bpy.data.objects.remove(obj, do_unlink = True)
+        
+
+        bpy.ops.import_scene.obj(filepath=objectFile)
+        #All imported objects are listed under selected after importing
+        self.objects = bpy.context.selected_objects
+
+        for object in self.objects:
+            object.parent = self.ObjectAxis
+        
 
     def randomQuaternion(self):
         '''Generate a random quaternion with uniformly distributed orientations'''
@@ -231,13 +256,15 @@ class Generator():
         
         return distance
 
-    def generateData(self, amount = 0):
+    def generateData(self, amount = 0, format = 'PNG'):
         #### TODO Set position and different angels for camera randomize them
         #### Freeform and locked
         #### DONE: Locked
 
         self.cleanFolder(self.dataFilePath)
         self.cleanFolder(self.annotationFilePath)
+
+        self.scene.render.image_settings.file_format= format
 
         if amount == 0:
             print("No data generated, data size specified is 0\n")
@@ -251,6 +278,7 @@ class Generator():
 
         annotationfile = os.path.join(self.annotationFilePath, 'annotation.json')
         
+        
 
         for i in range(amount):
 
@@ -263,12 +291,11 @@ class Generator():
             # camera.location = (0,0,distance)
 
             #Set the render save path for the image
-            imageFile = 'image{index}.png'.format(index = i)
+            imageFile = 'image{index}'.format(index = i)
             imagePath = os.path.join(self.dataFilePath, imageFile)
             self.scene.render.filepath = imagePath
 
             #render the view and save
-            # self.scene.render.image_settings.file_format='JPEG'
             bpy.ops.render.render(write_still=True)
 
             #Set segmentation image file path and name
