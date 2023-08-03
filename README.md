@@ -138,7 +138,9 @@ Data and annotation file path is used in the <b>filePath</b> variable, if no fil
 
 Parameters:
 
+```objectFile``` :
 
+```filePath``` :
 Class variables:
 
 <b>```self.scene```</b>
