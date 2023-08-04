@@ -7,7 +7,7 @@ import json
 import os, shutil
 
 class Generator():
-    def __init__(self, filePath = None, objectFile = None):
+    def __init__(self, filePath = None, objectFilePath = None):
         '''
         Constructor, set the objects or multiple objects if there are any
         '''
@@ -99,8 +99,8 @@ class Generator():
         #Import Object
         self.objects = None
 
-        if objectFile:
-            bpy.ops.import_scene.obj(filepath=objectFile)
+        if objectFilePath:
+            bpy.ops.import_scene.obj(filepath=objectFilePath)
 
             #All imported objects are listed under selected after importing
             self.objects = bpy.context.selected_objects
@@ -133,7 +133,7 @@ class Generator():
     def setFilePaths(self):
         pass
     
-    def importObject(self, objectFile):
+    def importObject(self, objectFilePath):
         '''
         Setter function for importing the object from an object file and setting the objects list
         '''
@@ -143,7 +143,7 @@ class Generator():
                 bpy.data.objects.remove(obj, do_unlink = True)
         
 
-        bpy.ops.import_scene.obj(filepath=objectFile)
+        bpy.ops.import_scene.obj(filepath=objectFilePath)
         #All imported objects are listed under selected after importing
         self.objects = bpy.context.selected_objects
 
@@ -169,8 +169,8 @@ class Generator():
     
     def cleanFolder(self, folderPath):
         '''
-        Utility function to clear temporary folder and files if it exist,
-        else create the folder, intended for internal use only
+        Utility function to clear folder and files if it exist,
+        intended for internal use only
         '''
         if os.path.isdir(folderPath):
             for filename in os.listdir(folderPath):
@@ -185,10 +185,10 @@ class Generator():
                         shutil.rmtree(filePath)
                 except Exception as e:
                     print('Failed to delete {filePath}. Reason: {error}'.format(filePath, e))
-        else:
-            pass
+        # else:
+        #     pass
 
-    def loadData(self, filePath, type=None):
+    def loadData(self, filePath):
         '''
         Utility function used to load array data from temporary exr file
         '''
@@ -219,7 +219,7 @@ class Generator():
         bbox_min = mathutils.Vector((float("inf"), float("inf"), float("inf")))
         bbox_max = mathutils.Vector((float("-inf"), float("-inf"), float("-inf")))
 
-        #determine the max and min of the bounding boxs, use matrix_world to convert to global space
+        #determine the max and min of the bounding boxs, use matrix_world to convert from model to global space
         for obj in objectArg:
             bbox = obj.bound_box
             for i in range(8):
@@ -339,16 +339,16 @@ class Generator():
 
         '''
 
-        '''Transformation matrix'''
+        #Transformation matrix
         matrix = self.Camera.matrix_world.normalized().inverted()
 
-        '''Using inverse of matrix to undo any transformation'''
+        #Using inverse of matrix to undo any transformation
         mesh = object.to_mesh(preserve_all_data_layers=True)
         # mesh = object
         mesh.transform(object.matrix_world)
         mesh.transform(matrix)
 
-        ''' world coordinates for the camera view frame bounding box'''
+        #world coordinates for the camera view frame bounding box
         frame = [-v for v in self.Camera.data.view_frame(scene=self.scene)[:3]]
 
         # Check if camera is in perspective or orthographic mode, 
@@ -362,10 +362,10 @@ class Generator():
             z = -co_local.z
 
             if z <= 0.0:
-                ''' Vertex is behind the camera; ignore it. '''
+                # Vertex is behind the camera; ignore it.
                 continue
             else:
-                ''' Perspective division '''
+                # Perspective division #
                 frame = [(v / (v.z / z)) for v in frame]
 
             min_x, max_x = frame[1].x, frame[2].x
@@ -377,18 +377,18 @@ class Generator():
             lx.append(x)
             ly.append(y)
 
-        ''' Image is not in view if all the mesh verts were ignored '''
+        #Image is not in view if all the mesh verts were ignored
         if not lx or not ly:
             return None
 
-        '''Limit the values between 0.0 and 1.0'''
+        #Limit the values between 0.0 and 1.0
         min_x = np.clip(min(lx), 0.0, 1.0)
         min_y = np.clip(min(ly), 0.0, 1.0)
 
         max_x = np.clip(max(lx), 0.0, 1.0)
         max_y = np.clip(max(ly), 0.0, 1.0)
 
-        ''' Image is not in view if both bounding points exist on the same side '''
+        #Image is not in view if both bounding points exist on the same side
         if min_x == max_x or min_y == max_y:
             return None
 
@@ -399,7 +399,7 @@ class Generator():
         dim_y = render.resolution_y 
 
 
-        '''Return coordinates in coco style annotation'''
+        #Return coordinates in coco style annotation
         return (min_x*dim_x, (1-min_y)*dim_y), (max_x*dim_x, (1-max_y)*dim_y)
     
     def setSegmentationNodes(self):
@@ -484,7 +484,8 @@ class Generator():
 
         return segmentation
 
-    def formatCoordinates(self, id, coordinates):
+    def formatCoordinates(self, coordinates):
+        '''Formats coordinates into coco style coordinates'''
         if coordinates: 
         ## Change coordinates reference frame
             x1 = (coordinates[0][0])
@@ -515,10 +516,11 @@ class Generator():
 
             if bbox: # boundingbox2d are found then do format
                 # print("         Initial coordinates:", bbox)
-                coordinates = self.formatCoordinates(id, bbox)
+                coordinates = self.formatCoordinates(bbox)
                 # print("         coordinates:", coordinates)
 
-                allBbox.append(coordinates) # Update main_text_coordinates variables whith each
+                # allBbox.append(coordinates) # Update main_text_coordinates variables whith each
+                allBbox[id] = coordinates
                 # line corresponding to each class in the frame of the current image
             
             else:

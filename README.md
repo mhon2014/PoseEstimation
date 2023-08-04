@@ -9,14 +9,12 @@
 
 [Blender Object Segmentation](/ObjectSegmentationWalkthrough.md)
 
-<h2 id='overview'> Overview </h2>
+<h1 id='overview'> Overview </h1>
 
----
 This repository contains Python code to interface with blender to generate synthetic data. These data are images that include annotation of segmentation and object quaternion. Random rotation and camera distances are currently used for data generation, other variations may be included later for future addition.
 
-<h2 id='gettingstarted'> Getting Started </h2>
+<h1 id='gettingstarted'> Getting Started </h1>
 
----
 Before getting started, install the blender python module, mathutils and numpy.
 
 https://wiki.blender.org/w/index.php?title=Building_Blender/Other/BlenderAsPyModule
@@ -53,9 +51,8 @@ from BlenderDataGenerator import SatteliteData
 generator = SatteliteData.Generator()
 
 ```
-<h2 id='datapreview'> Data Preview </h2>
+<h1 id='datapreview'> Data Preview </h1>
 
----
 The data generated from this script contains annotation and images in png format which can be changed to other formats within the script if needed. The JSON annotation file contains all metadata for the images and the associated segmentation file.
 
 Metadata:
@@ -123,92 +120,194 @@ Metadata:
 
 </div>
 
-<h2 id='references'> References </h2>
+<h1 id='references'> References </h1>
 
-----
-```python
-class Generator():
-    def __init__(self, filePath = None, objectFile = None)
-```
+## **SatteliteData.Generator(filePath = None, objectFilePath = None)**
+
+
 Generator constructor function, sets up the environment, camera and objects axis.
 
-If <b>objectFile</b> is given then generator will import object file from the given path.
+> Parameters:
 
-Data and annotation file path is used in the <b>filePath</b> variable, if no file path has been given then it will use the current directory in which the generator is created.
+```objectFilePath``` : {String} , Optional
 
-Parameters:
+ File path of object to import. Currently only wavefront obj format is being used. If left empty then no object will be imported and must be imported later for data generation.
 
-<table>
-<tr>
-<td>
-<code>objectFile<code>
-</td>
-<td>
-Path of object file to import. Currently only wavefront obj is supported.
-</td>
-</tr>
-</table>
-```objectFile``` :
+```filePath``` : {String} , Optional
 
-```filePath``` :
-Class variables:
+File path for storage of annotation and data. If left empty, then current directory where class is being called will be used.
 
-<b>```self.scene```</b>
+>Returns:
 
-<b>```self.ObjectAxis>```</b>
+Returns the initialized generator.
 
-<b>```self.CameraAxis>```</b>
+> Class variables:
 
-<b>```self.Camera>```</b>
+```self.scene```:
 
-<b>```self.cameraDistance>```</b>
+Contains current scene of the context. I.E. the current configuration and setup. Blender has a context and a context can have mutliple scene. However we only care about the scene that we're using for generation.
 
-<b>```self.lighting>```</b>
+```self.ObjectAxis```:
 
-<b>```self.rng>```</b> 
+The object axis which binds multiple objects or pieces together, if we rotate the axis then the all the pieces of the object move together.
 
-<b>```self.filePath>```</b>
+```self.CameraAxis```:
 
-<b>```self.dataFilePath```</b>
+Axis for the camera to rotate the camera around the object.
 
-<b>```self.annotationFilePath>```</b>
+```self.Camera```:
 
-<b>```self.tempFilePath>```</b>
+Camera object that points toward the objects.
 
-<b>```self.objects>```</b>
+```self.cameraDistance```:
+
+Camera distance, this is the distance of the camera where it has the entire object in view.
+
+```self.lighting```:
+
+Lighting object, currently a sun object is being used.
+
+```self.rng```:
+
+Random Number Generator, used for generating random quaternions for cameras axis rotation.
+
+```self.dataFilePath```:
+
+File path for data storage
+
+```self.annotationFilePath```:
+
+File path for annotation storage
+
+```self.tempFilePath```:
+
+File path for temporary storage of EXR file.
+
+```self.objects```:
+
+All the objects contained in a list
+
+## Class methods
+
+### **importObject(objectFilePath)**
+---
+Method to import object and set up parent-children hierarchy of the imported object.
+
+>Parameters:
+
+File path to object file.
+
+### **randomQuaternion()**
+---
+Generates random quaternion with numpy.random.Generator.uniform.
+
+> Returns:
+
+Returns a numpy array containin [w,x,y,z]
+
+### **getResolution()**
+---
+Utility method to get the resolution fo the rendering camera.
+
+> Returns:
+
+Returns resolution as x,y.
+
+### **cleanFolder(folderPath)**
+---
+Utility method to clear folder if it exists.
+
+>Parameters:
+
+```folderPath```: {String}
+
+File path to clean.
+
+### **loadData(filePath)**
+---
+>Parameters:
+
+```filePath```: {String}
+
+File path to load data from.
+
+>Returns:
+
+Returns a 2D numpy array of the pixels.
+
+### **findCameraDistance(cameraArg, objectArg)**
+---
+Method to return the camera distance to fit the selected objects into view
+
+>Parameters:
+
+```cameraArg```: {Blender Data Camera Object}
+
+The camera which the distance needs to be calculated for.
+
+```objectArg```: {Blender Data Camera Object}
+
+The list of objects in which the camera needs to fit into view.
+
+>Returns:
+
+Returns a numpy array of the pixels.
+
+### **generateData(amount=0)**
+
+---
+
+Method for generating data and annotation.
+
+>Parameters:
+
+```amount```: {int}
+
+Amount of data to be generated.
+
+### **getBoundingBox(object)**
+---
+
+Method used to get bounding box of a selected object.
+
+>Parameters: 
+
+```object```: {Blender Data Object}
+
+The object where the bounding box will be calculated from.
+
+>Returns:
+
+Returns 2 sets of coordinates in coco style annotation. I.E (x_min,y_min) , (x_width,y_height)
+### **setSegmentationNodes()**
+---
+Sets up the blender compositing used for segmentation,
 
 
-```python
-def randomQuaternion(self):
-```
-```python
-def getResolution(self):
-```
-```python
-def cleanFolder(self, folderPath):
-```
-```python
-def loadData(self, filePath, type=None):
-```
+### **getSegmentation()**
+---
+Returns the last saved render segmentation.
 
-```python
-def findCameraDistance(self, cameraArg, objectArg):
-```
-```python
-def generateData(self, amount = 0):
-```
-```python
-def getBoundingBox(self, object):
-```
-```python
-def setSegmentationNodes(self):
-```
-```python
-def getSegmentation(self):
-```
-```python
-def formatCoordinates(self, id, coordinates):
-```
-```python
-def getBoundingBoxCoordinates(self):
-```
+> Returns
+
+Returns a 2D numpy array of the pixels.
+
+### **formatCoordinates(coordinates)**
+---
+Formats coordinates into COCO style format
+>Parameters:
+
+```coordinates```: {2D List of coordinates}
+
+Coordinates to be formatted
+
+>Returns:
+
+Returns formatted coordinates. [xmin, ymin, width, height]
+### **getBoundingBoxCoordinates()**
+---
+Get bounding boxes of all objects in the camera's current view
+
+>Returns
+
+Returns a dictionary of  object id's and their COCO style coordinates 
