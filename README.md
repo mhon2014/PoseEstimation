@@ -138,6 +138,16 @@ Data and annotation file path is used in the <b>filePath</b> variable, if no fil
 
 Parameters:
 
+<table>
+<tr>
+<td>
+```objectFile```
+</td>
+<td>
+Path of object file to import. Currently only wavefront obj is supported.
+</td>
+</tr>
+</table>
 ```objectFile``` :
 
 ```filePath``` :

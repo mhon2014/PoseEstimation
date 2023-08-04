@@ -482,16 +482,7 @@ class Generator():
 
         segmentation = self.loadData(filePath)
 
-        # print(segmentation.shape)
-        # print(np.unique(segmentation))
-        # im = Image.fromarray(npImage)
-        # im.save("anotation/testfile.png")
         return segmentation
-
-        # categories_id = index
-        # obj = object
-        # # set each instance a unique inst_id, which is used to generate instance annotation.
-        # obj["inst_id"] = categories_id * 20
 
     def formatCoordinates(self, id, coordinates):
         if coordinates: 
