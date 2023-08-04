@@ -5,7 +5,7 @@
 
 [Data Preview](#datapreview)
 
-[References](#references)
+[Class Method References](#references)
 
 [Blender Object Segmentation](/ObjectSegmentationWalkthrough.md)
 
@@ -120,7 +120,7 @@ Metadata:
 
 </div>
 
-<h1 id='references'> References </h1>
+<h1 id='references'> Class Method References </h1>
 
 ## **SatteliteData.Generator(filePath = None, objectFilePath = None)**
 
@@ -194,6 +194,8 @@ All the objects contained in a list
 Method to import object and set up parent-children hierarchy of the imported object.
 
 >Parameters:
+
+```objectFilePath```: {String}
 
 File path to object file.
 
