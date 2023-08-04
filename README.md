@@ -141,7 +141,7 @@ Parameters:
 <table>
 <tr>
 <td>
-```objectFile```
+<code>objectFile<code>
 </td>
 <td>
 Path of object file to import. Currently only wavefront obj is supported.
