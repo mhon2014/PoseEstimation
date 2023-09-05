@@ -112,11 +112,11 @@ Metadata:
 </div>
 <h3><b>Image preview</b><h3>
 
-![Image Preview](imagePreview.png)
+![Image Preview](images/imagePreview.png)
 
 <h3><b>Segmentation preview</b><h3>
 
-![Segmentation Preview](segmentationPreview.png)
+![Segmentation Preview](images/segmentationPreview.png)
 
 </div>
 
