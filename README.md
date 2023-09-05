@@ -7,7 +7,7 @@
 
 [Class Method References](#references)
 
-[Blender Object Segmentation](/ObjectSegmentationWalkthrough.md)
+[Blender Object Seperation](/ObjectSeperationWalkthrough.md)
 
 <h1 id='overview'> Overview </h1>
 
