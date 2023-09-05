@@ -27,7 +27,9 @@ Clear all the current object as they might intefere with the next steps.
 
 Go under file and import the object. Up till now I've only experimented with .obj and .stl files however, you are free to choose as long as the object points
 
-![Import object](images/importFile.png)
+<p align="middle">
+  <img src="images/importFile.png" width="250" />
+</p>
 
 For this, I used the Dawn model as an example.
 
@@ -76,7 +78,7 @@ Once seperated, another object should appear under the collection or scene. Chan
 </p> -->
 
 
-![Select One](images/SelectOne.png)
+![Select One](images/selectOne.png)
 ![Select Two](images/selectTwo.png)
 
 
