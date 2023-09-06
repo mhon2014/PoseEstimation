@@ -6,8 +6,22 @@
 [Data Preview](#datapreview)
 
 [Class Method References](#references)
+- [SatteliteData.Generator(filePath = None, objectFilePath = None](#SatteliteData.Generator)
+- [importObject(objectFilePath)](#importObject)
+- [randomQuaternion()](#randomQuaternion)
+- [getResolution()](#getResolution)
+- [cleanFolder(folderPath)](#cleanFolder)
+- [loadData(filePath)](#loadData)
+- [findCameraDistance(cameraArg, objectArg)](#findCameraDistance)
+- [generateData(amount=0)](#generateData)
+- [getBoundingBox(object)](#getBoundingBox)
+- [setSegmentationNodes()](#setSegmentationNodes)
+- [getSegmentation()](#getSegmentation)
+- [formatCoordinates(coordinates)](#formatCoordinates)
+- [getBoundingBoxCoordinates()](#getBoundingBoxCoordinates)
 
 [Blender Object Seperation](/ObjectSeperationWalkthrough.md)
+
 
 <h1 id='overview'> Overview </h1>
 
@@ -122,7 +136,7 @@ Metadata:
 
 <h1 id='references'> Class Method References </h1>
 
-## **SatteliteData.Generator(filePath = None, objectFilePath = None)**
+<h2 id='SatteliteData.Generator'>SatteliteData.Generator(filePath = None, objectFilePath = None)</h2>
 
 
 Generator constructor function, sets up the environment, camera and objects axis.
@@ -189,7 +203,8 @@ All the objects contained in a list
 
 ## Class methods
 
-### **importObject(objectFilePath)**
+<h3 id='importObject'> importObject(objectFilePath) </h3>
+
 ---
 Method to import object and set up parent-children hierarchy of the imported object.
 
@@ -199,7 +214,8 @@ Method to import object and set up parent-children hierarchy of the imported obj
 
 File path to object file.
 
-### **randomQuaternion()**
+<h3 id='randomQuaternion'> randomQuaternion() </h3>
+
 ---
 Generates random quaternion with numpy.random.Generator.uniform.
 
@@ -207,7 +223,8 @@ Generates random quaternion with numpy.random.Generator.uniform.
 
 Returns a numpy array containin [w,x,y,z]
 
-### **getResolution()**
+<h3 id='getResolution'> getResolution() </h3>
+
 ---
 Utility method to get the resolution fo the rendering camera.
 
@@ -215,7 +232,8 @@ Utility method to get the resolution fo the rendering camera.
 
 Returns resolution as x,y.
 
-### **cleanFolder(folderPath)**
+<h3 id='cleanFolder'> cleanFolder(folderPath) </h3>
+
 ---
 Utility method to clear folder if it exists.
 
@@ -225,7 +243,8 @@ Utility method to clear folder if it exists.
 
 File path to clean.
 
-### **loadData(filePath)**
+<h3 id='loadData'> loadData(filePath) </h3>
+
 ---
 >Parameters:
 
@@ -237,7 +256,8 @@ File path to load data from.
 
 Returns a 2D numpy array of the pixels.
 
-### **findCameraDistance(cameraArg, objectArg)**
+<h3 id='findCameraDistance'> findCameraDistance(cameraArg, objectArg) </h3>
+
 ---
 Method to return the camera distance to fit the selected objects into view
 
@@ -255,7 +275,7 @@ The list of objects in which the camera needs to fit into view.
 
 Returns a numpy array of the pixels.
 
-### **generateData(amount=0)**
+<h3 id='generateData'> generateData(amount=0) </h3>
 
 ---
 
@@ -267,7 +287,8 @@ Method for generating data and annotation.
 
 Amount of data to be generated.
 
-### **getBoundingBox(object)**
+<h3 id='getBoundingBox'> getBoundingBox(object) </h3>
+
 ---
 
 Method used to get bounding box of a selected object.
@@ -281,12 +302,14 @@ The object where the bounding box will be calculated from.
 >Returns:
 
 Returns 2 sets of coordinates in coco style annotation. I.E (x_min,y_min) , (x_width,y_height)
-### **setSegmentationNodes()**
+<h3 id='setSegmentationNodes'> setSegmentationNodes() </h3>
+
 ---
 Sets up the blender compositing used for segmentation,
 
 
-### **getSegmentation()**
+<h3 id='getSegmentation'> getSegmentation() </h3>
+
 ---
 Returns the last saved render segmentation.
 
@@ -294,7 +317,8 @@ Returns the last saved render segmentation.
 
 Returns a 2D numpy array of the pixels.
 
-### **formatCoordinates(coordinates)**
+<h3 id='formatCoordinates'> formatCoordinates(coordinates) </h3>
+
 ---
 Formats coordinates into COCO style format
 >Parameters:
@@ -306,7 +330,8 @@ Coordinates to be formatted
 >Returns:
 
 Returns formatted coordinates. [xmin, ymin, width, height]
-### **getBoundingBoxCoordinates()**
+<h3 id='getBoundingBoxCoordinates'> getBoundingBoxCoordinates() </h3>
+
 ---
 Get bounding boxes of all objects in the camera's current view
 
