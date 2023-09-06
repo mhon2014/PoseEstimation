@@ -66,7 +66,7 @@ generator = SatteliteData.Generator()
 
 ```
 
-### Important to note if you are attempting to have multiple objects segmentation, then follow [Blender Object Seperation](/ObjectSeperationWalkthrough.md) guide as to make sure your objects are properly set up.
+### Important to note if you are attempting to have multiple objects segmentation, then follow [Blender Object Seperation](/ObjectSeperationWalkthrough.md) guide to make sure your objects are properly set up.
 
 
 <h1 id='datapreview'> Data Preview </h1>
