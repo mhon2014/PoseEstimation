@@ -65,6 +65,10 @@ from BlenderDataGenerator import SatteliteData
 generator = SatteliteData.Generator()
 
 ```
+
+### Important to note if you are attempting to have multiple objects segmentation, then follow [Blender Object Seperation](/ObjectSeperationWalkthrough.md) guide as to make sure your objects are properly set up.
+
+
 <h1 id='datapreview'> Data Preview </h1>
 
 The data generated from this script contains annotation and images in png format which can be changed to other formats within the script if needed. The JSON annotation file contains all metadata for the images and the associated segmentation file.

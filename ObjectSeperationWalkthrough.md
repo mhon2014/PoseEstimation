@@ -81,10 +81,13 @@ Once seperated, another object should appear under the collection or scene. Chan
 ![Select One](images/selectOne.png)
 ![Select Two](images/selectTwo.png)
 
+<b>Save the file as .obj and it is ready to be used for data generation!</b>
+
+
 
 <h3 id='objectparenting'>Object Parenting</h3>
 
-<b> This part can be ignored since the initial constructor in the code does the parenting, however this part shows how to do it manually. Do not add empty plain axis when using the generator code, as it assumes the imported object file has all the objects seperated and will assign an empty plain axis as a parent</b>
+<b> This part can be safely ignored since the initial constructor in the code does the parenting, however this part shows how to do it manually. Do not add empty plain axis when using the generator code, as it assumes the imported object file has all the objects seperated and will assign an empty plain axis as a parent</b>
 
 After we've done the seperation, we need to do the parenting to ensure that the seperated objects move together. To do this we're going to add an empty plain axis.
 
