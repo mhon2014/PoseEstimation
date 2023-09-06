@@ -14,7 +14,7 @@ This is step by step walkthrough on how to achieve object seperation for use in 
 <br>
 *Note: this was done on Mac, but should be similar if done on other OS.
 
-
+---
 <h3 id='importObject'> Import Object </h3>
 
 Open up you blender application and pick general file. You should see the default layout as shown below
@@ -27,7 +27,7 @@ Clear all the current object as they might intefere with the next steps.
 
 Go under file and import the object. Up till now I've only experimented with .obj and .stl files however, you are free to choose as long as the object points
 
-<p align="middle">
+<p align="center">
   <img src="images/importFile.png" width="250" />
 </p>
 
@@ -66,7 +66,7 @@ https://docs.blender.org/manual/en/latest/modeling/meshes/editing/mesh/separate.
 
 Once seperated, another object should appear under the collection or scene. Change the mode back to <b> object mode </b> instead of edit mode to view the changes.
 
-<p align="middle">
+<p align="center">
   <img src="images/seperatedObject.png" width="250" />
   <img src="images/viewMode.png" width="250" /> 
 </p>
@@ -84,8 +84,30 @@ Once seperated, another object should appear under the collection or scene. Chan
 
 <h3 id='objectparenting'>Object Parenting</h3>
 
-<b> This part can be ignored since the initial constructor in the code does the parenting, however this part shows how to do it manually. Do not add empty plain axis when using the generator, as it assumes the imported object file has all the objects seperated and will assign an empty plain axis as a parent</b>
+<b> This part can be ignored since the initial constructor in the code does the parenting, however this part shows how to do it manually. Do not add empty plain axis when using the generator code, as it assumes the imported object file has all the objects seperated and will assign an empty plain axis as a parent</b>
 
 After we've done the seperation, we need to do the parenting to ensure that the seperated objects move together. To do this we're going to add an empty plain axis.
 
-https://docs.blender.org/manual/en/latest/scene_layout/object/editing/parent.html
+![Empty axis](images/emptyplain.png)
+
+Select the objects with the empty axis as the active object. When parenting is set, the active object will be the parent of all selected. To do this, use the ctlr key and select (ctrl key + left click) all of the objects with the empty axis being the last one. This is because the last object to be selected is the empty object. To know which is current the active object, it is has a lighter yellow highlight on the name compared to the orange highlight on the other objects
+
+<p align="center">
+  <img src="images/parentingSelection.png" width="250" />
+</p>
+
+Click the parenting option under Object -> parent -> object.
+
+![parentingOption](images/parentingOption.png)
+
+
+
+
+
+Pretty good video describing object parenting:
+
+- https://www.youtube.com/watch?v=GS452KMVWKA
+
+Official documentation on parenting:
+
+- https://docs.blender.org/manual/en/latest/scene_layout/object/editing/parent.html
